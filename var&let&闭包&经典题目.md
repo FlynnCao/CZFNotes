@@ -2,7 +2,7 @@
 
 [toc]
 
-![u=2443502536,3755706708&fm=26&gp=0](D:\GithubNewWorld\CZFNotes\images\var&let&闭包&经典题目\u=2443502536,3755706708&fm=26&gp=0.jpg)
+![u=1894241208,139720229&fm=26&gp=0](images/var&let&%E9%97%AD%E5%8C%85&%E7%BB%8F%E5%85%B8%E9%A2%98%E7%9B%AE/u=1894241208,139720229&fm=26&gp=0.jpg)
 
 ## 闭包
 
