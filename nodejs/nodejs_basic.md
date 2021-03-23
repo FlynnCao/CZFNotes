@@ -282,9 +282,9 @@ npm install 模块名@版本号
 
 > `npm install jquery@next`安装测试版
 
-## 文件管理
+## 管理
 
-### 原生fs
+### 原生fs - 管理文件目录
 
 引入模块`const fs = require('fs');`
 
@@ -597,4 +597,71 @@ asyncPrint('hello world', 50);
 ```
 
 > await 命令后面的 Promise 对象，运行结果可能是 rejected，所以最好把 await 命令放在 try...catch 代码块中。
+
+
+
+### fs流以及管道流 - 操作文件或图片内容
+
+fs流相当于在代码间向文件创建了一个管道以分批次读取或者写入内容，因此需要先指定详细位置：
+
+#### 单向
+
+* 读取文件数据 `fs.createReadStream`
+
+例子：读取根目录下`data`文件夹中的指定文本：
+
+```js
+const fs = require('fs');
+let readStream = fs.createReadStream('./data/input.txt');
+let count = 0;
+let str = '';
+readStream.on('data', (data) => {
+    str += data;
+    count++;
+});
+readStream.on('end', () => {
+    console.log(str);
+    console.log(count);
+});
+readStream.on('error', (err)=>{
+   console.log(err); 
+});
+```
+
+> 读取次数的多少跟大小有关 >0
+
+* 写入文件数据 `fs.writeStream`
+
+例子：向根目录下`data`目录中创建新文件并写入内容
+
+```js
+const fs = require('fs');
+let str = '';
+for (let index = 0; index < 500; index++) {
+    str+='我是一个普通的数据';
+}
+let writeStream = fs.createWriteStream('./data/output.txt');
+writeStream.write(str);
+//标记文件末尾
+writeStream.end();
+//标记写入完成
+writeStream.on('finish', ()=>{
+    console.log('写入完成！');
+});
+```
+
+#### 双向
+
+* 复制文件
+
+复制图片到指定位置
+
+```js
+const fs = require('fs');
+let readStream =  fs.createReadStream('./source/1.jpg');
+let writeStream = fs.createWriteStream('./des/2.jpg');
+readStream.pipe(writeStream);
+```
+
+![image-20210323145420397](nodejs_basic.assets/image-20210323145420397.png)
 
