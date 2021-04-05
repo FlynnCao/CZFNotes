@@ -1,5 +1,7 @@
 # Nodejs入门基础
 
+[toc]
+
 ## http模块、url模块、supervisor
 
 ### 工具
@@ -74,9 +76,9 @@ const http = require('http')
 
 则可以正常打印中文![img](nodejs_basic.assets/f749235a-6ca3-47a3-ba99-9eee4d544bac.png)
 
-\### 获取get方法传递过来的明参
+###  获取get方法传递过来的明参 
 
-使用require方法加载url模块，其中的parse方法可以解析请求体，
+使用require方法加载url模块，其中的parse方法可以解析请求体**####11+版本弃用####**
 
 例如：api为`http://www.baidu.com?name=zhangsan&password=123` 默认解析为：
 
@@ -664,4 +666,37 @@ readStream.pipe(writeStream);
 ```
 
 ![image-20210323145420397](nodejs_basic.assets/image-20210323145420397.png)
+
+
+
+## EJS 模板引擎和get/post方法
+
+### 动态服务器
+
+将数据库和文件读取的文件显示在HTML上
+
+* 读取文件并渲染（如果连接了数据库可以动态修改）
+
+```javascript
+   ejs.renderFile('./views/form.ejs', {}, (err, data) => {
+               response.writeHead(200, { 'Content-Type': 'text/html;charset="utf-8"' })
+               response.end(data)
+            })
+```
+
+### 原生解析客户端传递的post参数
+
+使用`request.method`可以查询到此次会话的**请求方法**
+
+使用流和监听的方式来取回post传值数据
+
+```javascript
+  let postData = ''
+            request.on('data', (chunk) => {
+               postData += chunk             
+            })
+            request.on('end',()=>{
+               response.end(postData) //放置在请求尾中
+            })
+```
 
