@@ -93,7 +93,7 @@ $my-color:#323232;
 }
 ~~~
 
-## 数据类型
+## 数据类型 :cucumber:
 
 * 数字 `1  2.5  13  10p!x 5a` 
 
@@ -406,4 +406,211 @@ g.  `%placeholder`为选择器占位符，配合`@extend-Only选择器`使用。
   font-weight: bold;
   font-size: 2em; }
 ```
+
+### @at-root
+
+将代码置于最顶层
+
+### @debug
+
+便于调试
+
+### @warn
+
+用于警告
+
+### @error
+
+用于报错
+
+
+
+## 控制指令
+
+### if() 三元运算
+
+表达式`if(expression, value1, value2)`
+
+```scss
+p{
+    color:if(1+2 < 2, green, red)
+}
+```
+
+编译为
+
+```css
+p {
+  color: red;
+}
+```
+
+### `@if` `@else` `@else if `条件语句
+
+```scss
+$a:1;
+p{
+    @if $a == 1 {
+        color:blue
+    }@else if $a == 2{
+        color:red
+    }@else{	
+		color:green
+    }
+}
+```
+
+编译为
+
+```css
+p {
+  color: blue;
+}
+```
+
+> 当$a值为2时编译为 p{color:red}，其余为p{color:green}
+
+### `@for`循环
+
+循环语句
+
+语法：`@for $var from <start> through <end>`或`@for $var from <start> to <end>`
+
+> 使用through结束包含<end>的值，而使用to结束不包含<end>的值
+
+```scss
+@for $i from 1 through 3{
+    .item-#{$i} {width:10px * $i} 
+}
+```
+
+编译为
+
+```css
+.item-1 {
+  width: 10px;
+}
+
+.item-2 {
+  width: 20px;
+}
+
+.item-3 {
+  width: 30px;
+}
+```
+
+### `@while`循环
+
+表达式 `@while expression`
+
+`@while` 指令重复输出格式直到表达式返回结果为 `false`。这样可以实现比 `@for` 更复杂的循环，只是很少会用到
+
+```scss
+$i: 6;
+@while $i > 0 {
+    .item-#{$i} {
+        width: 10px * $i;
+    }
+    $i: $i-2;
+}
+```
+
+> 其中  $i: $i-2; 是赋值减语句
+
+编译为
+
+```css
+.item-1 {
+  width: 10px;
+}
+
+.item-2 {
+  width: 20px;
+}
+
+.item-3 {
+  width: 30px;
+}
+```
+
+### @each 
+
+*循环语句*
+
+表达式：`$var in $vars`
+
+`$var` 可以是任何变量名
+
+`$vars` 只能是`Lists`或者`Maps`
+
+* 一维列表
+
+  ~~~scss
+  @each $animal in puma, sea-slug, egret, salamander {
+    .#{$animal}-icon {
+      background-image: url('/images/#{$animal}.png');
+    }
+  }
+  
+  // compile:
+  .puma-icon {
+    background-image: url('/images/puma.png'); }
+  .sea-slug-icon {
+    background-image: url('/images/sea-slug.png'); }
+  .egret-icon {
+    background-image: url('/images/egret.png'); }
+  .salamander-icon {
+    background-image: url('/images/salamander.png'); }
+  ~~~
+
+- 二维列表 :warning:
+
+  ~~~scss
+  @each $first, $second, $third in (puma, black, default),
+                                    (sea-slug, blue, pointer),
+                                    (egret, white, move) {
+    .#{$first}-icon {
+      background-image: url('/images/#{$first}.png');
+      border: 2px solid $second;
+      cursor: $third;
+    }
+  }
+  
+  // compile:
+  .puma-icon {
+    background-image: url('/images/puma.png');
+    border: 2px solid black;
+    cursor: default; }
+  .sea-slug-icon {
+    background-image: url('/images/sea-slug.png');
+    border: 2px solid blue;
+    cursor: pointer; }
+  .egret-icon {
+    background-image: url('/images/egret.png');
+    border: 2px solid white;
+    cursor: move; }
+  ~~~
+
+  > 请注意这种方式每次将任意变量对应一个数组的任意个元素，然后下次循环读取下个数组的全部元素 
+
+- maps对象
+
+  ~~~scss
+  @each $header, $size in (h1: 2em, h2: 1.5em, h3: 1.2em) {
+    #{$header} {
+      font-size: $size;
+    }
+  }
+  
+  // compile:
+  h1 {
+    font-size: 2em; }
+  h2 {
+    font-size: 1.5em; }
+  h3 {
+    font-size: 1.2em; }
+  ~~~
+
+  
 
