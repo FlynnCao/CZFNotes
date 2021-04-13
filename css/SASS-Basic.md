@@ -612,5 +612,456 @@ $i: 6;
     font-size: 1.2em; }
   ~~~
 
-  
+## 混合指令
+
+> 混合指令（Mixin）用于定义可重复使用的样式，避免了使用无语意的 class，比如 `.float-left`。混合指令可以包含所有的 CSS 规则，绝大部分 Sass 规则，甚至通过参数功能引入变量，输出多样化的样式。
+
+注意：这不是函数！没有返回值！！
+
+混合指令就是一大堆样式的集合，用来避免使用无意义的CSS
+
+### 1.定义混合指令
+
+混合指令的用法是在 `@mixin` 后添加名称与样式，以及需要的参数（可选）。
+
+~~~scss
+// 格式：
+@mixin name {
+    // 样式....
+}
+~~~
+
+~~~scss
+// example：
+@mixin large-text {
+  font: {
+    family: Arial;
+    size: 20px;
+    weight: bold;
+  }
+  color: #ff0000;
+}
+~~~
+
+
+
+### 2.引用混合样式
+
+使用 `@include` 指令引用混合样式，格式是在其后添加混合名称，以及需要的参数（可选）。
+
+~~~scss
+// 格式：
+@include name;
+
+// 注：无参数或参数都有默认值时，带不带括号都可以
+~~~
+
+~~~scss
+// example：
+p {
+    @include large-text;
+}
+
+// compile:
+p {
+  font-family: Arial;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff0000;
+}
+~~~
+
+
+
+### 3.参数
+
+格式：按照变量的格式，通过逗号分隔，将参数写进Mixin名称后的圆括号里
+
+支持默认值；支持多参数；支持不定参数；支持位置传参和关键词传参
+
+
+
+> 括号以及内部的为形参，传入实参可以为其他变量名或者具体值
+
+
+
+#### a. 位置传参
+
+~~~scss
+@mixin mp($width) {
+    margin: $width;
+}
+
+body {
+    @include mp(300px);
+}
+~~~
+
+
+
+#### b.关键词传参
+
+~~~scss
+@mixin mp($width) {
+    margin: $width;
+}
+
+body {
+    @include mp($width: 300px);
+}
+~~~
+
+
+
+#### c.参数默认值
+
+~~~scss
+@mixin mp($width: 500px) {
+    margin: $width;
+}
+
+body {
+    @include mp($width: 300px);
+    // or
+    @include mp(300px);
+}
+~~~
+
+
+
+#### d.不定参数
+
+> 官方：Variable Arguments
+>
+> 译文：参数变量
+>
+> 
+>
+> 有时，不能确定混合指令需要使用多少个参数。这时，可以使用参数变量 `…` 声明（写在参数的最后方）告诉 Sass 将这些参数视为值列表处理
+
+~~~scss
+@mixin mar($value...) {
+    margin: $value;
+}
+~~~
+
+
+
+### 4.先导入，再定义
+
+在引用混合样式的时候，可以先将一段代码导入到混合指令中，然后再输出混合样式，额外导入的部分将出现在 `@content` 标志的地方
+
+可以看作参数的升级版
+
+~~~scss
+@mixin large-text {
+    .abc{
+        @content
+    }
+}
+@include large-text {
+    display: flex;
+    .logo {
+        height: 100px;
+    }
+}
+
+
+// compile:
+.abc {
+  display: flex;
+}
+
+.abc .logo {
+  height: 100px;
+}
+
+~~~
+
+
+
+
+
+
+
+
+
+------
+
+## 十、函数指令
+
+scss的下标从1开始
+
+### 1.内置函数
+
+#### a. 字符串函数
+
+> 索引第一个为1，最后一个为-1；切片两边均为闭区间
+
+| 函数名和参数类型                        |                  函数作用                   |
+| :-------------------------------------- | :-----------------------------------------: |
+| quote($string)                          |                  添加引号                   |
+| unquote($string)                        |                  除去引号                   |
+| to-lower-case($string)                  |                  变为小写                   |
+| to-upper-case($string)                  |                  变为大写                   |
+| str-length($string)                     |        返回$string的长度(汉字算一个)        |
+| str-index($string，$substring)          |        返回$substring在$string的位置        |
+| str-insert($string, $insert, $index)    |       在$string的$index处插入$insert        |
+| str-slice($string, $start-at, $end-at） | 截取$string的$start-at和$end-at之间的字符串 |
+
+> ster-insert的$index为插入的目标位置
+
+例子：
+
+```css
+.b {
+    font-family: to-upper-case(sass);
+    font-family: to-lower-case("SASS");
+    width: str-length("javascript");
+    height: str-length("中国人民");
+    font-size: str-index("abcabc", "ca");
+    line-height: str-insert("iyou", "love", 2);
+    line-height: str-slice("great", 1, 2);
+}
+//compile
+.b {
+  font-family: SASS;
+  font-family: "sass";
+  width: 10;
+  height: 4;
+  font-size: 3;
+  line-height: "iloveyou";
+  line-height: "gr";
+}
+
+```
+
+
+
+#### b. 数字函数
+
+| 函数名和参数类型        |                           函数作用                           |
+| ----------------------- | :----------------------------------------------------------: |
+| percentage($number)     |                       转换为百分比形式                       |
+| round($number)          |                        四舍五入为整数                        |
+| ceil($number)           |                         数值向上取整                         |
+| floor($number)          |                         数值向下取整                         |
+| abs($number)            |                          获取绝对值                          |
+| min($number...)         |                          获取最小值                          |
+| max($number...)         |                          获取最大值                          |
+| random($number?:number) | 不传入值：获得0-1的随机数；传入正整数n：获得0-n的随机整数（左开右闭） |
+
+例子
+
+```css
+.c{
+    width: percentage(0.75);
+    width: round(3.3434343);
+    width: ceil(3.772);
+    width: floor(3.772);
+    width: abs(-1.332);
+    width: min(7,3,1,5);
+    width: max(0,6,10,2);
+    height:random();
+    height:random(10); 
+}
+//compile
+.c {
+  width: 75%;
+  width: 3;
+  width: 4;
+  width: 3;
+  width: 1.332;
+  width: 1;
+  width: 10;
+  height: 0.19857;
+  height: 9;
+}
+```
+
+
+
+#### c. 数组函数
+
+| 函数名和参数类型                 |                           函数作用                           |
+| -------------------------------- | :----------------------------------------------------------: |
+| length($list)                    |                         获取数组长度                         |
+| nth($list, n)                    |                      获取指定下标的元素                      |
+| set-nth($list, $n, $value)       |               向$list的$n处插入$value，替换之                |
+| join($list1, $list2, $separator) | 拼接$list1和list2；$separator为新list的分隔符，默认为auto，可选择comma、space |
+| append($list, $val, $separator)  | 向$list的末尾添加$val；$separator为新list的分隔符，默认为auto，可选择comma、space |
+| index($list, $value)             |                返回$value值在$list中的索引值                 |
+| zip($lists…)                     | 将几个列表结合成一个多维的列表；要求每个的列表个数值必须是相同的 |
+
+```css
+$my:zip(3 6 2 , 7 1 10, 2 2 3);
+.d {
+    width: length(3 1 2 5);
+    width: nth(2 6 5 1, $n: 2);
+    width: set-nth(1 3 2 5, 2, -1);
+    width: join(1 3 5, 2 4 6, space);
+    width: append(1 3 2, 5, space);
+    height: zip(3 6 2 , 7 1 10, 2 2 3);
+    line-height:length($my)
+}
+//compile
+.d {
+  width: 4;
+  width: 6;
+  width: 1 -1 2 5;
+  width: 1 3 5 2 4 6;
+  width: 1 3 2 5;
+  height: 3 7 2, 6 1 2, 2 10 3;
+  line-height: 3;
+}
+```
+
+> $my为3*3的二维Number型数组
+
+#### d. 映射函数
+
+| 函数名和参数类型        |                 函数作用                 |
+| ----------------------- | :--------------------------------------: |
+| map-get($map, $key)     |        获取$map中$key对应的$value        |
+| map-merge($map1, $map2) |     合并$map1和$map2，返回一个新$map     |
+| map-remove($map, $key)  |     从$map中删除$key，返回一个新$map     |
+| map-keys($map)          |            返回$map所有的$key            |
+| map-values($map)        |           返回$map所有的$value           |
+| map-has-key($map, $key) | 判断$map中是否存在$key，返回对应的布尔值 |
+| keywords($args)         |  返回一个函数的参数，并可以动态修改其值  |
+
+
+
+#### e. 颜色函数
+
+- **RGB函数**
+
+  | 函数名和参数类型               |                           函数作用                           |
+  | ------------------------------ | :----------------------------------------------------------: |
+  | rgb($red, $green, $blue)       |                     返回一个16进制颜色值                     |
+  | rgba($red,$green,$blue,$alpha) | 返回一个rgba；$red,$green和$blue可被当作一个整体以颜色单词、hsl、rgb或16进制形式传入 |
+  | red($color)                    |                   从$color中获取其中红色值                   |
+  | green($color)                  |                   从$color中获取其中绿色值                   |
+  | blue($color)                   |                   从$color中获取其中蓝色值                   |
+  | mix($color1,$color2,$weight?)  |     按照$weight比例，将$color1和$color2混合为一个新颜色      |
+
+- **HSL函数**
+
+  | 函数名和参数类型                         | 函数作用                                                     |
+  | ---------------------------------------- | ------------------------------------------------------------ |
+  | hsl($hue,$saturation,$lightness)         | 通过色相（hue）、饱和度(saturation)和亮度（lightness）的值创建一个颜色 |
+  | hsla($hue,$saturation,$lightness,$alpha) | 通过色相（hue）、饱和度(saturation)、亮度（lightness）和透明（alpha）的值创建一个颜色 |
+  | saturation($color)                       | 从一个颜色中获取饱和度（saturation）值                       |
+  | lightness($color)                        | 从一个颜色中获取亮度（lightness）值                          |
+  | adjust-hue($color,$degrees)              | 通过改变一个颜色的色相值，创建一个新的颜色                   |
+  | lighten($color,$amount)                  | 通过改变颜色的亮度值，让颜色变亮，创建一个新的颜色           |
+  | darken($color,$amount)                   | 通过改变颜色的亮度值，让颜色变暗，创建一个新的颜色           |
+  | hue($color)                              | 从一个颜色中获取亮度色相（hue）值                            |
+
+- **Opacity函数**
+
+  |                                                             |                  |
+  | ----------------------------------------------------------- | ---------------- |
+  | alpha($color)/opacity($color)                               | 获取颜色透明度值 |
+  | rgba($color,$alpha)                                         | 改变颜色的透明度 |
+  | opacify($color, $amount) / fade-in($color, $amount)         | 使颜色更不透明   |
+  | transparentize($color, $amount) / fade-out($color, $amount) | 使颜色更加透明   |
+
+
+
+#### f. Introspection函数
+
+| 函数名和参数类型               |                           函数作用                           |
+| ------------------------------ | :----------------------------------------------------------: |
+| type-of($value)                |                       返回$value的类型                       |
+| unit($number)                  |                      返回$number的单位                       |
+| unitless($number)              |           判断$number是否带单位，返回对应的布尔值            |
+| comparable($number1, $number2) | 判断$number1和$number2是否可以做加、减和合并，返回对应的布尔值 |
+
+
+
+
+
+### 2.自定义函数
+
+> Sass 支持自定义函数，并能在任何属性值或 Sass script 中使用
+>
+> Params: 与Mixin一致
+>
+> 
+>
+> 支持返回值
+
+**基本格式：**
+
+~~~scss
+@function fn-name($params...) {
+    @return $params;
+}
+~~~
+
+
+
+~~~scss
+// example:
+@function fn-name($params...) {
+    @return nth($params, 1);
+}
+p {
+    height: fn-name(1px);
+}
+
+// compiled:
+p {
+  height: 1px;
+}
+~~~
+
+
+
+
+
+
+
+------
+
+## 十一、细节与展望
+
+### 1.细节
+
+a. @extend、@Mixin和@function的选择
+
+[原文链接](https://csswizardry.com/2016/02/mixins-better-for-performance/)
+
+![image-20200707171035353](https://raw.githubusercontent.com/ggdream/scss/master/sources.assets/image-20200707171035353.png)
+
+> `minxins`在网络传输中比`@extend` 拥有更好的性能.尽管有些文件未压缩时更大，但使用`gzip`压缩后，依然可以保证我们拥有更好的性能。
+
+
+
+
+
+**所以@extend我们就尽量不要使用了，而@Mixin和@function的差别在定义和使用上**
+
+
+
+> 定义方式不同： `@function` 需要调用`@return`输出结果。而 @mixin则不需要。
+>
+> 使用方式不同：`@mixin` 使用`@include`引用，而 `@function` 使用小括号执行函数。
+
+
+
+
+
+
+
+### 2.展望
+
+>
+>
+>以上内容算是"基础"部分，但是对于日常开发，我觉得是足够使用的了。
+>
+>如果想要进一步了解，就必须先去学习下Ruby，使用Ruby相关模块进行更丰富地学习
+
+### Unfinished...
 
