@@ -93,7 +93,7 @@ $my-color:#323232;
 }
 ~~~
 
-## 数据类型 :cucumber:
+## :star:数据类型  
 
 * 数字 `1  2.5  13  10p!x 5a` 
 
@@ -213,7 +213,7 @@ $a: 1 > 0 and 0 > 5; //false
 
 > 值与布尔运算符之间必须有空格
 
-### 颜色值运算 :heart:
+### :heart:颜色值运算 
 
 - 颜色值是分段进行计算的，分别计算红色、绿色和蓝色的值，然后将结果进行拼接
 - 颜色值的乘法也是分区域最后拼接得到结果
@@ -327,7 +327,7 @@ Sass 中 `@media` 指令与 CSS 中用法一样，只是增加了一点额外的
 
 
 
-### @extend :star2:
+### @extend 
 
 @extend就是继承，主要用于scss代码的复用。
 
@@ -928,9 +928,28 @@ $my:zip(3 6 2 , 7 1 10, 2 2 3);
 | map-keys($map)          |            返回$map所有的$key            |
 | map-values($map)        |           返回$map所有的$value           |
 | map-has-key($map, $key) | 判断$map中是否存在$key，返回对应的布尔值 |
-| keywords($args)         |  返回一个函数的参数，并可以动态修改其值  |
 
+```scss
 
+$obj:(
+    name:'tony',
+    age:13
+);
+$allKeys:map-keys($obj);
+$allValues:map-values($obj);
+$hasScore:map-has-key($obj,"score");
+.abc{
+    width:$allKeys;
+    height:$allValues;
+    line-height:$hasScore;    
+}
+//compile
+.abc {
+  width: name, age;
+  height: "tony", 13;
+  line-height: false;
+}
+```
 
 #### e. 颜色函数
 
@@ -945,6 +964,29 @@ $my:zip(3 6 2 , 7 1 10, 2 2 3);
   | blue($color)                   |                   从$color中获取其中蓝色值                   |
   | mix($color1,$color2,$weight?)  |     按照$weight比例，将$color1和$color2混合为一个新颜色      |
 
+  ```scss
+  $myColor:(green + red);
+  $testColor:red;
+  $yourColor:#38f;
+  .abc {
+      color: rgb(133, 222, 355);
+      background-color: rgba(133, 222, 120, 0.3);
+      background-color: rgba($myColor, 0.3);
+      border-color: red($myColor);
+      font:mix($yourColor,$testColor, 77);
+  }
+  //compile
+  .abc {
+    color: #85deff;
+    background-color: rgba(133, 222, 120, 0.3);
+    background-color: rgba(255, 128, 0, 0.3);
+    border-color: 255;
+    font: #6269c4;
+  }
+  ```
+
+  > $weight为第一个颜色在结果中的占比，77即为77%
+
 - **HSL函数**
 
   | 函数名和参数类型                         | 函数作用                                                     |
@@ -958,6 +1000,40 @@ $my:zip(3 6 2 , 7 1 10, 2 2 3);
   | darken($color,$amount)                   | 通过改变颜色的亮度值，让颜色变暗，创建一个新的颜色           |
   | hue($color)                              | 从一个颜色中获取亮度色相（hue）值                            |
 
+  ```scss
+  .abc{
+      color:hsl(121, 332, 100);
+      background-color:hsla(222,210,222,0.3);
+      width: saturation(#dd3322);
+      height: lightness(#ddaaee);
+      line-height: hue(#38f);
+      border-color: adjust-hue(#38f,33);    
+      &:hover{
+          color:lighten(#38f,20);
+      }
+      &:focus{
+          color:darken(#38f,20);
+      }
+  }
+  //compile
+  .abc {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.3);
+    width: 73.33333%;
+    height: 80%;
+    line-height: 215deg;
+    border-color: #4e33ff;
+  }
+  .abc:hover {
+    color: #99c4ff;
+  }
+  .abc:focus {
+    color: #0055cc;
+  }
+  ```
+
+  
+
 - **Opacity函数**
 
   |                                                             |                  |
@@ -967,6 +1043,24 @@ $my:zip(3 6 2 , 7 1 10, 2 2 3);
   | opacify($color, $amount) / fade-in($color, $amount)         | 使颜色更不透明   |
   | transparentize($color, $amount) / fade-out($color, $amount) | 使颜色更加透明   |
 
+```scss
+.abc {
+    width: alpha(#38f);
+    color:#38f;
+    $color1: opacify(#38f, 0.3);
+    background-color: $color1;
+    $color2:fade-out(#38f, 0.3);
+    border-color: $color2;
+}
+//compile
+.abc {
+  width: 1;
+  color: #38f;
+  background-color: #3388ff;
+  border-color: rgba(51, 136, 255, 0.7); 
+}
+```
+
 
 
 #### f. Introspection函数
@@ -975,10 +1069,59 @@ $my:zip(3 6 2 , 7 1 10, 2 2 3);
 | ------------------------------ | :----------------------------------------------------------: |
 | type-of($value)                |                       返回$value的类型                       |
 | unit($number)                  |                      返回$number的单位                       |
-| unitless($number)              |           判断$number是否带单位，返回对应的布尔值            |
+| unitless($number)              |             Number有单位返回true 无单位返回false             |
 | comparable($number1, $number2) | 判断$number1和$number2是否可以做加、减和合并，返回对应的布尔值 |
 
+```scss
+.abc{
+    width: type-of(1);
+    height:type-of(red);
+    line-height: type-of('abc');
+    border:type-of(#38f);
+    margin:type-of(1 2 3);
+    padding:type-of(("name":"tony", age:11));
+    opacity:type-of(3 > 4);
+   // display: type-of($var);
+}
+.d{
+    width:unit(33);
+    height:unit(33px);
+    line-height: unit(33em);
+    border:unitless(22.3);
+    padding: comparable(1, 3);
+    padding: comparable(1px, 3);
+    padding: comparable(100, -33);
+    padding: comparable(1em, 3px);
+    padding: comparable(1em, 3px);
+    padding: comparable(1rem, 3em);
+}
+//compile
+.abc {
+  width: number;
+  height: color;
+  line-height: string;
+  border: color;
+  margin: list;
+  padding: map;
+  opacity: bool;
+}
 
+.d {
+  width: "";
+  height: "px";
+  line-height: "em";
+  border: true;
+  padding: true;
+  padding: true;
+  padding: true;
+  padding: false;
+  padding: false;
+  padding: false;
+}
+
+```
+
+总结：只有px数值才能跟无单位的数值等价替换；颜色中的 十六进制、颜色关键字等价替换
 
 
 
@@ -1003,65 +1146,20 @@ $my:zip(3 6 2 , 7 1 10, 2 2 3);
 
 
 ~~~scss
-// example:
-@function fn-name($params...) {
-    @return nth($params, 1);
+@function add($x, $y){
+    @return $x + $y;
 }
-p {
-    height: fn-name(1px);
+.abc{
+    width: add(2,3);
+}
+//compile
+.abc {
+  width: 5;
 }
 
-// compiled:
-p {
-  height: 1px;
-}
 ~~~
 
 
 
 
-
-
-
-------
-
-## 十一、细节与展望
-
-### 1.细节
-
-a. @extend、@Mixin和@function的选择
-
-[原文链接](https://csswizardry.com/2016/02/mixins-better-for-performance/)
-
-![image-20200707171035353](https://raw.githubusercontent.com/ggdream/scss/master/sources.assets/image-20200707171035353.png)
-
-> `minxins`在网络传输中比`@extend` 拥有更好的性能.尽管有些文件未压缩时更大，但使用`gzip`压缩后，依然可以保证我们拥有更好的性能。
-
-
-
-
-
-**所以@extend我们就尽量不要使用了，而@Mixin和@function的差别在定义和使用上**
-
-
-
-> 定义方式不同： `@function` 需要调用`@return`输出结果。而 @mixin则不需要。
->
-> 使用方式不同：`@mixin` 使用`@include`引用，而 `@function` 使用小括号执行函数。
-
-
-
-
-
-
-
-### 2.展望
-
->
->
->以上内容算是"基础"部分，但是对于日常开发，我觉得是足够使用的了。
->
->如果想要进一步了解，就必须先去学习下Ruby，使用Ruby相关模块进行更丰富地学习
-
-### Unfinished...
 
