@@ -1,3 +1,7 @@
+[toc]
+
+
+
 # switch
 
 使用checkbox实现，  原生的vuejs可以绑定表单元素传入布尔值 这里只需要注意特殊情况的处理 增加额外功能 修改样式即可
@@ -30,7 +34,7 @@
 
 请注意input和change事件的监控并不会返回 true或false 
 
-:art:
+![Snipaste_2021-04-29_17-23-17](https://image-1256777099.cos.ap-beijing-fsi.myqcloud.com/Snipaste_2021-04-29_17-23-17.png)
 
  在不传入任何属性的情况下 this.value 返回 false 用户点击input后 通过input和change事件分发true(或者onValue指定的类型)
 
@@ -57,10 +61,6 @@ this.$nextTick(() => {
 ```
 
 这里就完成了构造开关的过程 - 》圆点平移 -》 修改颜色
-
-
-
-
 
 ## 核心和文字标签
 
